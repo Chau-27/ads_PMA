@@ -26,3 +26,10 @@ jobs:
           python -m pip install --upgrade pip 
           pip install -r requirements.txt 
           pip install pytest  # Ensure pytest is installed
+
+      - name: Run Tests 
+        run: pytest tests/ -v
+
+      - name: Deploy 
+        if: github.ref == 'refs/heads/main' 
+        run: echo "Deploying to production" 
