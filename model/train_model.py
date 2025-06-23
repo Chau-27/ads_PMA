@@ -15,7 +15,7 @@ y = df["DEFAULT_NEXT_MONTH"]
 
 # Pipeline
 model = Pipeline([
-    ("regressor", DecisionTreeClassifier())
+    ("classifier", DecisionTreeClassifier())
 ])
 
 # Train
