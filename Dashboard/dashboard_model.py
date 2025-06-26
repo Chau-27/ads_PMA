@@ -11,7 +11,7 @@ st.title("Customer Default Risk Dashboard")
 # ✅ Load data from Excel (specify the correct sheet)
 @st.cache_data
 def load_data():
-    df = pd.read_excel("Processed_data_for_dashboard.xlsx", sheet_name="Data")
+    df = pd.read_excel("Dashboard/Processed_data_for_dashboard.xlsx", sheet_name="Data")
     return df
 
 df = load_data()
@@ -67,7 +67,7 @@ default_by_age.index = default_by_age.index.astype(str)
 st.bar_chart(default_by_age)
 
 # Load model
-model = joblib.load("default_model.pkl")
+model = joblib.load("Dashboard/default_model.pkl")
 
 # Create input bar for the model
 with st.expander("Enter Customer Information", expanded=True):
