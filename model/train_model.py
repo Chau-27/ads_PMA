@@ -6,6 +6,8 @@ import joblib
 
 # Load data
 df = pd.read_csv("Model_Data_Input.csv")
+
+# Defined X and y, Dropped "ID" in X as it is not a feature 
 X = df[["LIMIT_BAL","GENDER","EDUCATION_POSTGRAD","EDUCATION_GRADUATE","EDUCATION_HIGHSCHOOL","MARRIAGE_MARRIED",
         "MARRIAGE_SINGLE","AGE","PAY_STATUS_SEP05","PAY_STATUS_AUG05","PAY_STATUS_JUL05","PAY_STATUS_JUN05",
         "PAY_STATUS_MAY05","PAY_STATUS_APR05","BILL_AMT_SEP05","BILL_AMT_AUG05","BILL_AMT_JUL05","BILL_AMT_JUN05",
