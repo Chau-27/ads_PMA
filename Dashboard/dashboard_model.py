@@ -4,19 +4,22 @@ import joblib
 import requests
 import io
 
+# Set up the Streamlit page configuration
 st.set_page_config(page_title="Credit Default Dashboard", layout="wide")
 
 st.title("Customer Default Risk Dashboard")
 
-# ✅ Load data from Excel (specify the correct sheet)
+# Load data from GitHub
 @st.cache_data
 def load_data():
-    df = pd.read_excel("Dashboard/Processed_data_for_dashboard.xlsx", sheet_name="Data")
+    url = "https://raw.githubusercontent.com/Chau-27/ads_PMA/main/Dashboard/Processed_data_for_dashboard.xlsx"
+    response = requests.get(url)
+    df = pd.read_excel(io.BytesIO(response.content), sheet_name="Data")
     return df
 
 df = load_data()
 
-# ✅ Sidebar filters
+# Sidebar filters
 st.sidebar.header("Filter Options")
 
 # Credit Limit filter
@@ -37,7 +40,7 @@ selected_education = st.sidebar.selectbox("Education", education_options)
 gender_options = ["All"] + sorted(df["SEX"].unique())
 selected_gender = st.sidebar.selectbox("Gender", gender_options)
 
-# ✅ Apply filters
+# Apply filters
 filtered_df = df[
     (df["LIMIT_BAL"] >= limit_range[0]) & (df["LIMIT_BAL"] <= limit_range[1]) &
     (df["AGE"] >= age_range[0]) & (df["AGE"] <= age_range[1])
@@ -49,19 +52,19 @@ if selected_education != "All":
 if selected_gender != "All":
     filtered_df = filtered_df[filtered_df["SEX"] == selected_gender]
 
-# ✅ Summary
+# Create Summary Metrics
 st.subheader("Summary Metrics")
 col1, col2 = st.columns(2)
 col1.metric("Total Customers", len(filtered_df))
 col2.metric("Default Rate", f"{filtered_df['default payment next month'].mean()*100:.2f} %")
 
-# ✅ Visualization: Default Rate by Age Group
+# Visualization: Default Rate by Age Group
 st.subheader("Default Rate by Age Group")
 
 age_bins = pd.cut(filtered_df["AGE"], bins=[20, 30, 40, 50, 60, 70, 80])
 default_by_age = filtered_df.groupby(age_bins)["default payment next month"].mean()
 
-# ✅ Convert index to string so Streamlit can render
+# Convert index to string so Streamlit can render
 default_by_age.index = default_by_age.index.astype(str)
 
 st.bar_chart(default_by_age)
@@ -69,7 +72,7 @@ st.bar_chart(default_by_age)
 # Load model
 model = joblib.load("Dashboard/default_model.pkl")
 
-# Create input bar for the model
+# Arrange input bar for the model
 with st.expander("Enter Customer Information", expanded=True):
     col1, col2, col3, col4 = st.columns(4)
 
@@ -112,7 +115,7 @@ with st.expander("Enter Customer Information", expanded=True):
         PAY_AMT_MAY05 = st.number_input("Pay Amount May 2005", value=0)
         PAY_AMT_APR05 = st.number_input("Pay Amount Apr 2005", value=0)
 
-# Prepare input
+# Prepare model input
 input_df = pd.DataFrame({
     "LIMIT_BAL": [LIMIT_BAL],
     "GENDER": [GENDER],
@@ -142,7 +145,7 @@ input_df = pd.DataFrame({
     "PAY_AMT_APR05": [PAY_AMT_APR05]
 })
 
-# Ensure input_df columns are in the same order as model expects
+# Ensure input_df columns are in the same order as the trained model
 expected_features = model.named_steps['Regression'].feature_names_in_
 input_df = input_df[expected_features]
 
